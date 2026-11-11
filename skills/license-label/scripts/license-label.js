@@ -610,7 +610,7 @@ function labelCard({ project, rel, pkgs, own, notes, changes, generated, opinion
   H.push(`<p class="sub">${rel && rel !== '.' ? `Folder <code>${esc(rel)}</code>. ` : ''}Made ${esc(generated)}. Based on the licence each package declares for itself.</p>`);
   H.push(`<div class="ship"><span class="pill">${esc(M.name)}</span> ${esc(M.blurb)} <span class="via">${shipWhy === 'set' ? 'Set by you.' : `A guess${shipWhy ? `, from ${esc(shipWhy)}` : ''}. If it is wrong, set it with <code>--ship</code>.`}</span></div>`);
   if (flags && flags.length) {
-    H.push(`<div class="flagbox" role="alert"><h3>${flags.length === 1 ? '1 thing needs' : `${flags.length} things need`} your attention</h3><ul>${flags.map((f) => `<li><b>${esc(flagText(f, project))}</b> ${esc(flagWhy(f, ship))} <span class="via">Flagged ${esc(f.since)}.</span></li>`).join('')}</ul><p class="small">A flag stays here until its cause goes away, or you record that you have checked it with <code>--accept "package=why it is fine"</code>. <code>--seen</code> clears them all.</p></div>`);
+    H.push(`<div class="flagbox" role="alert"><h3>${flags.length === 1 ? '1 thing needs' : `${flags.length} things need`} your attention</h3><ul>${flags.map((f) => `<li><b>${esc(flagText(f, project))}</b> ${esc(flagWhy(f, ship))} <span class="via">Flagged ${esc(f.since)}.</span></li>`).join('')}</ul><p class="small">A flag stays here until its cause goes away, or you record that you have checked it. Tell your coding agent you have checked it and why, or run this tool with <code>--accept "package=why it is fine"</code>.</p></div>`);
   }
   H.push('<hr class="rule">');
   H.push(`<div class="count"><p>${esc(M.count)}</p><span class="big">${num(shippedTotal)}</span></div>`);
@@ -868,23 +868,24 @@ function flagWhy(f, ship) {
 }
 
 /** The message for a person, in plain words: what changed, why it matters, what they can do. */
-function flagMessage(open, labelPath) {
+function flagMessage(open, labelPath, root) {
   const lines = ['Licence label: something changed in this project that the person should know about.', ''];
   for (const { l, f } of open) lines.push(`- ${flagText(f, l.project)} ${flagWhy(f, l.ship)}`);
-  lines.push('', 'What they can do: replace the part, read its licence, or, if they have checked it and it is fine, record that so it stops being flagged:',
-    '  license-label --accept "package-name=why it is fine"', '', `The full label is at ${labelPath}.`);
+  lines.push('', 'What they can do: replace the part, read its licence, or say that they have checked it and it is fine.',
+    'If they say they have checked it, this records their reason so it stops being flagged (the command is for the agent to run, not the person):',
+    `  node "${process.argv[1]}" "${root}" -o "${labelPath}" --accept "package-name=their reason"`, '', `The full label is at ${labelPath}.`);
   return lines.join('\n');
 }
 
 /** Claude Code Stop-hook output: a short warning the person sees, and context the agent
  *  receives so that it tells the person in its reply. Printed once per new flag. */
-function hookSpeak(fresh, labelPath) {
+function hookSpeak(fresh, labelPath, root) {
   const first = flagText(fresh[0].f, fresh[0].l.project);
   process.stdout.write(JSON.stringify({
     systemMessage: `Licence label: ${fresh.length === 1 ? '1 change needs' : `${fresh.length} changes need`} your attention. ${first}${fresh.length > 1 ? ' (and more)' : ''}`,
     hookSpecificOutput: {
       hookEventName: 'Stop',
-      additionalContext: flagMessage(fresh, labelPath) + '\n\nThe person has not been told yet. They would want to hear this now, in two or three plain sentences, with the suggested next step. This is based on declared licences and is not legal advice.',
+      additionalContext: flagMessage(fresh, labelPath, root) + '\n\nThe person has not been told yet. They would want to hear this now, in two or three plain sentences, with the suggested next step. This is based on declared licences and is not legal advice.',
     },
   }) + '\n');
   return 0;
@@ -1083,7 +1084,7 @@ async function main(argv) {
     fs.appendFileSync(process.env.GITHUB_OUTPUT,
       `strictest=${worst === null ? 0 : worst + 1}\nunknown=${unknownTotal}\nmoved=${anyMoved}\nnotable=${notable}\nspeak=${fresh.length > 0}\nflags=${labels.reduce((n, l) => n + l.flags.length, 0)}\n`);
   }
-  if (a.hook && fresh.length) { console.log = log; return hookSpeak(fresh, a.out); }
+  if (a.hook && fresh.length) { console.log = log; return hookSpeak(fresh, a.out, root); }
   console.log = log;
   return fail ? 2 : 0;
 }

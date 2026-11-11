@@ -1,6 +1,6 @@
 {
   "name": "license-label",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A plain-language licence label for the open-source parts inside an app: the strictest licence, what it means for how you ship, and the minimum to do.",
   "license": "MIT",
   "author": "Adnan Khan (https://www.justusability.com)",

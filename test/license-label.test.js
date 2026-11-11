@@ -197,6 +197,7 @@ test('flags: raised once, stay open, and stop when the person records a check', 
   assert.strictEqual(out.hookSpecificOutput.hookEventName, 'Stop');
   const said = out.hookSpecificOutput.additionalContext;
   assert.match(said, /something changed in this project that the person should know about/);
+  assert.match(said, /node ".*license-label\.js" ".*" -o "license-label\.html" --accept/); // a command the agent can actually run
   assert.match(said, /moved from step 2 \(keep the notice\) to step 5 \(share it even when hosted\), because of c/);
   assert.doesNotMatch(said, /A new part sits at step 5/); // the step flag already names c
   assert.match(said, /A new part could not be placed on the scale: paid declares "SEE LICENSE IN LICENSE"/);
