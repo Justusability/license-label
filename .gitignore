@@ -1,0 +1,7 @@
+# Working notes and labels made from private projects. Never publish.
+internal/
+node_modules/
+.DS_Store
+# Labels made while trying the tool in this folder
+/license-label.html
+/license-label.json

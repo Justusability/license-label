@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "justusability",
+  "description": "Plain-language tools for people who build apps with AI coding agents. A Justusability project.",
+  "owner": {
+    "name": "Adnan Khan",
+    "url": "https://www.justusability.com"
+  },
+  "plugins": [
+    {
+      "name": "license-label",
+      "description": "A plain-language licence label for the open-source parts inside your app: the strictest licence, what it means for how you ship, and the minimum to do.",
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/Justusability/license-label"
+    }
+  ]
+}

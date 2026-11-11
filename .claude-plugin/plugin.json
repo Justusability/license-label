@@ -1,0 +1,13 @@
+{
+  "name": "license-label",
+  "version": "0.1.0",
+  "description": "A plain-language licence label for the open-source parts inside your app: the strictest licence, what it means for how you ship, and the minimum to do. Refreshes itself when dependencies change.",
+  "author": {
+    "name": "Adnan Khan",
+    "url": "https://www.justusability.com"
+  },
+  "homepage": "https://github.com/Justusability/license-label",
+  "repository": "https://github.com/Justusability/license-label",
+  "license": "MIT",
+  "keywords": ["license", "licence", "open source", "compliance", "sbom", "notices", "dependencies", "plain language"]
+}

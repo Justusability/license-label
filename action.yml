@@ -1,0 +1,67 @@
+name: Licence label
+description: Remake the plain-language licence label when dependencies change, and speak up on the pull request only when the strictest step moves or something unknown arrives.
+branding:
+  icon: tag
+  color: green
+inputs:
+  path:
+    description: Project folder to read
+    default: "."
+  out:
+    description: HTML file to write, relative to the project folder. Commit it (and the .json beside it) so changes can be detected.
+    default: license-label.html
+  fail-above:
+    description: Fail the check if the app goes beyond this step (1-5) or has unknown licences. Leave empty to never fail.
+    default: ""
+  verify:
+    description: Ask deps.dev for a second opinion on each package in the app
+    default: "false"
+  comment:
+    description: Comment on the pull request when something important changed
+    default: "true"
+outputs:
+  strictest:
+    description: Strictest step found in the app (1-5, or 0 for none)
+    value: ${{ steps.label.outputs.strictest }}
+  unknown:
+    description: Number of parts in the app that could not be placed on the scale
+    value: ${{ steps.label.outputs.unknown }}
+  moved:
+    description: "true if the strictest step changed since the committed label"
+    value: ${{ steps.label.outputs.moved }}
+runs:
+  using: composite
+  steps:
+    - id: label
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      env:
+        OUT: ${{ inputs.out }}
+        FAIL_ABOVE: ${{ inputs.fail-above }}
+        VERIFY: ${{ inputs.verify }}
+      run: |
+        args=(. -o "$OUT" --summary "$RUNNER_TEMP/license-label-summary.md")
+        if [ -n "$FAIL_ABOVE" ]; then args+=(--fail-above "$FAIL_ABOVE"); fi
+        if [ "$VERIFY" = "true" ]; then args+=(--verify); fi
+        set +e
+        node "$GITHUB_ACTION_PATH/skills/license-label/scripts/license-label.js" "${args[@]}"
+        code=$?
+        set -e
+        echo "code=$code" >> "$GITHUB_OUTPUT"
+        if [ -f "$RUNNER_TEMP/license-label-summary.md" ]; then cat "$RUNNER_TEMP/license-label-summary.md" >> "$GITHUB_STEP_SUMMARY"; fi
+    - if: ${{ inputs.comment == 'true' && github.event_name == 'pull_request' && (steps.label.outputs.speak == 'true' || steps.label.outputs.code == '2') }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR: ${{ github.event.pull_request.number }}
+      run: gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/license-label-summary.md"
+    - uses: actions/upload-artifact@v4
+      with:
+        name: license-label
+        path: |
+          ${{ inputs.path }}/${{ inputs.out }}
+    - if: ${{ steps.label.outputs.code != '0' }}
+      shell: bash
+      env:
+        CODE: ${{ steps.label.outputs.code }}
+      run: exit "$CODE"

@@ -1,0 +1,41 @@
+{
+  "name": "license-label",
+  "version": "0.1.0",
+  "description": "A plain-language licence label for the open-source parts inside an app: the strictest licence, what it means for how you ship, and the minimum to do.",
+  "license": "MIT",
+  "author": "Adnan Khan (https://www.justusability.com)",
+  "homepage": "https://github.com/Justusability/license-label#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Justusability/license-label.git"
+  },
+  "bugs": "https://github.com/Justusability/license-label/issues",
+  "bin": {
+    "license-label": "skills/license-label/scripts/license-label.js",
+    "licence-label": "skills/license-label/scripts/license-label.js"
+  },
+  "main": "skills/license-label/scripts/license-label.js",
+  "files": [
+    "skills/license-label",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "license",
+    "licence",
+    "open source",
+    "sbom",
+    "notices",
+    "compliance",
+    "plain language",
+    "claude-code",
+    "agent-skill"
+  ],
+  "private": true
+}

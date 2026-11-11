@@ -1,0 +1,16 @@
+{
+  "description": "Refresh an existing licence label when a lockfile has changed, and tell the person if something significant moved. Never creates a label on its own.",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/skills/license-label/scripts/license-label.js\" \"${CLAUDE_PROJECT_DIR}\" -o \"${CLAUDE_PROJECT_DIR}/license-label.html\" --if-changed --hook",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
